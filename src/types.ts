@@ -1,24 +1,30 @@
 export type Skill = 'reading' | 'listening' | 'speaking' | 'writing' | 'vocabulary'
 export type TaskStatus = 'todo' | 'completed' | 'skipped'
 export type PlanIntensity = 10 | 50 | 90 | 'custom'
+export type DataMode = 'real' | 'demo'
 
 export interface LearnerProfile {
   id?: string
   name: string
-  currentScore: number
-  targetScore: number
-  examDate: string
+  selfReportedLevel: string
+  currentScore: number | null
+  targetScore: number | null
+  examDate: string | null
   dailyMinutes: number
-  weakSkill: Skill
+  prioritySkill: Skill | null
   topics: string[]
   timezone: string
   reminderTime: string
+  notificationsEnabled: boolean
+  quietHoursStart: string
+  quietHoursEnd: string
   onboardingComplete: boolean
 }
 
 export interface StudyTask {
   id: string
   userId?: string
+  planId?: string
   title: string
   description: string
   scheduledDate: string
@@ -26,6 +32,8 @@ export interface StudyTask {
   durationMinutes: number
   status: TaskStatus
   source: 'manual' | 'rule' | 'rescheduled'
+  isMinimumTask: boolean
+  completionMethod?: 'timer' | 'manual_confirmation'
   completedAt?: string
   createdAt: string
   rescheduledFrom?: string
@@ -57,11 +65,15 @@ export interface ScoreRecord {
 
 export interface DailyCheckin {
   date: string
-  energy: 'low' | 'steady' | 'high'
+  energy?: 'low' | 'steady' | 'high'
+  habitQualified: boolean
+  verifiedMinutes: number
+  method?: 'timer' | 'manual_confirmation'
   note?: string
 }
 
 export interface QuestData {
+  dataMode: DataMode
   profile: LearnerProfile
   tasks: StudyTask[]
   sessions: StudySession[]

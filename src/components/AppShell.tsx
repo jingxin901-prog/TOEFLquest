@@ -1,4 +1,5 @@
-import { BarChart3, CalendarDays, Cloud, CloudOff, Compass, LayoutDashboard, Settings2 } from 'lucide-react'
+import { BarChart3, CalendarDays, Cloud, CloudOff, Compass, LayoutDashboard, Moon, Settings2, Sun } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { useQuestStore } from '../hooks/useQuestStore'
 import { TimerDock } from './TimerDock'
@@ -15,7 +16,12 @@ const titles: Record<string, string> = { '/': '今日学习', '/calendar': '学�
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation()
-  const { syncStatus, user } = useQuestStore()
+  const { syncStatus, user, dataMode } = useQuestStore()
+  const [dark, setDark] = useState(() => localStorage.getItem('toefl-quest:theme') === 'dark')
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', dark)
+    localStorage.setItem('toefl-quest:theme', dark ? 'dark' : 'light')
+  }, [dark])
   const syncLabel = user ? (syncStatus === 'synced' ? '云端已同步' : syncStatus === 'syncing' ? '正在同步' : '同步异常') : '本机保存'
 
   return <div className="min-h-screen bg-[#f5f7f4] text-[#20332b] lg:grid lg:grid-cols-[238px_1fr]">
@@ -36,7 +42,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-w-0 lg:col-start-2">
       <header className="sticky top-0 z-20 flex h-[72px] items-center justify-between border-b border-[#e5ebe7] bg-[#f5f7f4]/90 px-5 backdrop-blur-xl sm:px-8">
         <div><p className="text-[11px] font-semibold uppercase tracking-[.16em] text-[#89968f]">Your daily route</p><h1 className="text-xl font-extrabold tracking-tight">{titles[pathname] ?? 'TOEFL Quest'}</h1></div>
-        <div className="rounded-full border border-[#dce6df] bg-white px-3 py-1.5 text-xs font-semibold text-[#5f7167]">新版 TOEFL · 1–6 分制</div>
+        <div className="flex items-center gap-2"><span className={`hidden rounded-full px-3 py-1.5 text-[10px] font-bold sm:inline ${dataMode === 'demo' ? 'bg-[#fff1c8] text-[#80641d]' : 'bg-[#e9f4ec] text-[#2e7250]'}`}>{dataMode === 'demo' ? '演示数据' : '真实数据'}</span><div className="hidden rounded-full border border-[#dce6df] bg-white px-3 py-1.5 text-xs font-semibold text-[#5f7167] sm:block">新版 TOEFL · 1–6 分制</div><button onClick={() => setDark((value) => !value)} className="focus-ring grid size-9 place-items-center rounded-xl border border-[#dce6df] bg-white text-[#5f7167]" aria-label={dark ? '切换浅色模式' : '切换深色模式'}>{dark ? <Sun size={16} /> : <Moon size={16} />}</button></div>
       </header>
       <main className="mx-auto w-full max-w-[1440px] px-4 pb-32 pt-6 sm:px-8 sm:pt-8">{children}</main>
     </div>

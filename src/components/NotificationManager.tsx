@@ -5,11 +5,16 @@ import { dateKeyInTimeZone } from '../lib/date'
 export function NotificationManager() {
   const store = useQuestStore()
   useEffect(() => {
-    if (!('Notification' in window) || Notification.permission !== 'granted') return
+    if (!store.profile.notificationsEnabled || !('Notification' in window) || Notification.permission !== 'granted') return
     const check = () => {
       const now = new Date()
       const time = new Intl.DateTimeFormat('en-GB', { timeZone: store.profile.timezone, hour: '2-digit', minute: '2-digit', hour12: false }).format(now)
       const today = dateKeyInTimeZone(now, store.profile.timezone)
+      const { quietHoursStart, quietHoursEnd } = store.profile
+      const inQuietHours = quietHoursStart <= quietHoursEnd
+        ? time >= quietHoursStart && time < quietHoursEnd
+        : time >= quietHoursStart || time < quietHoursEnd
+      if (inQuietHours) return
       const key = `toefl-quest:notified:${today}`
       const pending = store.tasks.some((task) => task.scheduledDate === today && task.status === 'todo')
       if (time === store.profile.reminderTime && pending && !localStorage.getItem(key)) {
@@ -20,6 +25,6 @@ export function NotificationManager() {
     check()
     const timer = window.setInterval(check, 30_000)
     return () => window.clearInterval(timer)
-  }, [store.profile.reminderTime, store.profile.timezone, store.tasks])
+  }, [store.profile.notificationsEnabled, store.profile.quietHoursEnd, store.profile.quietHoursStart, store.profile.reminderTime, store.profile.timezone, store.tasks])
   return null
 }

@@ -47,7 +47,7 @@ export function TaskList({ date, title, showDate = false }: { date: string; titl
       return
     }
     const recorded = store.sessions.filter((session) => session.taskId === task.id).reduce((sum, item) => sum + item.durationMinutes, 0)
-    if (recorded >= Math.max(5, Math.round(task.durationMinutes * 0.5))) await store.setTaskStatus(task.id, 'completed')
+    if (recorded >= Math.max(5, Math.round(task.durationMinutes * 0.5))) await store.setTaskStatus(task.id, 'completed', 'timer')
     else setConfirming(task)
   }
 
@@ -63,7 +63,7 @@ export function TaskList({ date, title, showDate = false }: { date: string; titl
           <div className="flex items-start gap-3">
             <button onClick={() => tryComplete(task)} className={`focus-ring mt-0.5 grid size-6 shrink-0 place-items-center rounded-lg border transition ${done ? 'border-[#37845b] bg-[#37845b] text-white' : 'border-[#c7d1ca] bg-white text-transparent hover:border-[#4d936d]'}`} aria-label={done ? '标为未完成' : '确认完成'}><Check size={15} strokeWidth={3} /></button>
             <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2"><SkillBadge skill={task.skill} />{task.source === 'rescheduled' && <span className="rounded-full bg-[#fff6dd] px-2 py-1 text-[10px] font-semibold text-[#9b7415]">已补排</span>}</div>
+              <div className="flex flex-wrap items-center gap-2"><SkillBadge skill={task.skill} />{task.isMinimumTask && <span className="rounded-full bg-[#eaf6ed] px-2 py-1 text-[10px] font-semibold text-[#2d754f]">今日保底</span>}{task.source === 'rescheduled' && <span className="rounded-full bg-[#fff6dd] px-2 py-1 text-[10px] font-semibold text-[#9b7415]">已补排</span>}</div>
               <h3 className={`mt-2 font-bold leading-6 ${done ? 'text-[#718079] line-through' : 'text-[#253c31]'}`}>{task.title}</h3>
               {task.description && <p className="mt-1 text-sm leading-6 text-[#75837b]">{task.description}</p>}
               <div className="mt-3 flex items-center gap-3 text-xs font-medium text-[#849087]"><span className="flex items-center gap-1"><Clock3 size={13} />{task.durationMinutes} 分钟</span><span>· {SKILL_META[task.skill].label}</span></div>
@@ -97,7 +97,7 @@ export function TaskList({ date, title, showDate = false }: { date: string; titl
 
     <Modal open={Boolean(confirming)} onClose={() => setConfirming(null)} title="确认本次完成">
       <p className="text-sm leading-7 text-[#64756b]">这项任务还没有达到建议计时长度。若你已在别处完成，可以手动确认；系统会把它记录为用户确认，而不是仅因打开页面就自动完成。</p>
-      <div className="mt-6 flex justify-end gap-3"><Button variant="secondary" onClick={() => setConfirming(null)}>继续学习</Button><Button onClick={async () => { if (confirming) await store.setTaskStatus(confirming.id, 'completed'); setConfirming(null) }}>我确认已完成</Button></div>
+      <div className="mt-6 flex justify-end gap-3"><Button variant="secondary" onClick={() => setConfirming(null)}>继续学习</Button><Button onClick={async () => { if (confirming) await store.setTaskStatus(confirming.id, 'completed', 'manual_confirmation'); setConfirming(null) }}>我确认已完成</Button></div>
     </Modal>
   </div>
 }

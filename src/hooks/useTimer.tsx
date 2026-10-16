@@ -60,7 +60,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
       endedAt,
       durationMinutes,
     })
-    if (completeTask) await store.setTaskStatus(task.id, 'completed')
+    if (completeTask) await store.setTaskStatus(task.id, 'completed', 'timer')
     reset()
   }
 

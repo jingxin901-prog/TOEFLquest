@@ -1,22 +1,51 @@
-# TOEFL Quest 架构规划
+# TOEFL Quest 2.0 架构
 
-## 产品分层
+## 现有架构总结
 
-1. **体验层**：React 页面与可复用组件；`HashRouter` 兼容静态托管与 GitHub Pages。
-2. **领域层**：计划生成、时区日期、连续打卡和统计计算均为纯 TypeScript，可独立测试。
-3. **状态层**：`QuestStoreProvider` 统一管理学习档案、任务、计时记录、成绩与精力打卡。
-4. **持久化层**：默认 `localStorage`；配置 Supabase 后使用 Auth + PostgreSQL，并由 RLS 隔离用户数据。
-5. **扩展边界**：AI 与外部通知只接服务端代理 URL，浏览器端不保存供应商密钥。
+1. **体验层**：React 页面与组件，`HashRouter` 兼容静态托管；PC 使用侧栏，移动端使用底部导航。
+2. **领域层**：计划生成、用户时区日期、任务完成率、习惯连续天数和学习时长统计均为纯 TypeScript，可由 Vitest 单独验证。
+3. **状态层**：`QuestStoreProvider` 管理资料、任务、会话、打卡与成绩；`TimerProvider` 只负责当前计时状态，并在结束时写入学习会话。
+4. **持久化层**：本机真实数据、Demo 数据使用不同版本化 key；配置 Supabase 后，真实数据经 Auth + PostgreSQL 同步，登录时重新水合。
+5. **安全层**：所有用户数据关联 `user_id`；数据库开启 RLS。浏览器只允许 anon key；AI、`service_role`、飞书 Webhook 只允许进入服务端环境。
+6. **质量层**：Vitest 覆盖计划/统计/组件闭环，Playwright 覆盖桌面与移动端的创建、计时、完成、打卡和刷新恢复。
 
-## 阶段计划
+## 关键领域规则
 
-- **Phase 1（已完成）**：Dashboard、学习月历、任务 CRUD、完成确认、学习计时、连续打卡、统计、规则学习计划、Supabase 同步。
-- **Phase 2**：阅读导入、音频分段、口语录音、写作草稿、生词间隔复习。复用现有任务与学习记录模型。
-- **Phase 3**：服务端 AI 反馈、基于表现的周计划、通知代理、飞书 Webhook 与自动周报。
+- “大学英语六级左右”是自评文字，不转换为 TOEFL 分数。
+- 目标 TOEFL 分数与考试日期可以为空。
+- 无诊断证据时 `prioritySkill = null`，计划保持听说读写基本覆盖。
+- 每个学习日有独立 `isMinimumTask` 保底任务；习惯打卡与目标任务完成率分别计算。
+- 选择能量状态不构成打卡。打卡需要计时记录或明确完成确认。
+- 页面打开、计时开始都不自动完成任务；完成来源记录为 `timer` 或 `manual_confirmation`。
+- `official`、`mock`、`ai` 记录严格分类；AI 反馈不用于官方目标差距。
+- 日期归属、今天与连续记录均使用用户配置的 IANA 时区。
 
-## 关键约束
+## 数据关系
 
-- 日期状态以用户 `timezone` 计算，不依赖部署服务器时区。
-- 任务不会因页面打开而完成；完成必须来自足量计时或用户明确确认。
-- `official`、`mock`、`ai` 三类成绩永不混淆，AI 分数不用于官方目标差距。
-- 2026-01-21 后的 TOEFL 计划使用新版题型和 1–6、0.5 增量分制。
+```text
+auth.users
+  ├─ user_profiles (1:1)
+  ├─ learning_goals (1:1 active goal)
+  ├─ notification_preferences (1:1)
+  ├─ study_plans ──< daily_tasks ──< study_sessions
+  ├─ checkins
+  ├─ diagnostic_tests ──< diagnostic_attempts >── diagnostic_questions
+  ├─ skill_assessments
+  ├─ practice_submissions
+  ├─ vocabulary_items
+  └─ score_records
+```
+
+诊断的口语/写作提交在 `review_status = pending_human_or_ai` 时不得生成能力分；后续人工或可靠 AI 评估完成后才能变更为 `reviewed`。
+
+## 官方考试基线
+
+系统按 ETS 2026 Test Blueprint 建模新版题型：
+
+- Reading：Complete the Words、Read in Daily Life、Read an Academic Passage
+- Listening：Listen and Choose a Response、Conversation、Announcement、Academic Talk
+- Speaking：Listen and Repeat、Take an Interview
+- Writing：Build a Sentence、Write an Email、Academic Discussion
+- 2026-01-21 起正式成绩采用 1–6、0.5 步进
+
+题库只使用原创内容或用户有权导入的材料，不复制 ETS 付费试题。

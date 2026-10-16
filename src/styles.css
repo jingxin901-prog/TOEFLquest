@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   font-family: Inter, "PingFang SC", "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
@@ -32,3 +33,12 @@ button { cursor: pointer; }
 }
 
 .quest-pop { animation: quest-pop .24s ease-out; }
+
+.dark { color-scheme: dark; }
+.dark body, .dark #root { background: #102019; color: #e4eee8; }
+.dark [class*="bg-[#f5f7f4]"], .dark [class*="bg-[#fbfcfb]"], .dark [class*="bg-[#f9fbf9]"] { background-color: #13241c !important; }
+.dark [class*="bg-white"] { background-color: #1a2c23 !important; }
+.dark .soft-card { background: rgba(25, 43, 34, .96); border-color: rgba(190, 224, 202, .12); }
+.dark input, .dark select, .dark textarea { background: #15271e; color: #e4eee8; border-color: #355044; }
+.dark [class*="text-[#2"], .dark [class*="text-[#1"], .dark [class*="text-[#3"] { color: #dcebe2 !important; }
+.dark [class*="border-[#e"], .dark [class*="border-[#d"] { border-color: #31493d !important; }

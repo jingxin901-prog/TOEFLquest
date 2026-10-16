@@ -1,5 +1,5 @@
 import { addDays, dateKeyInTimeZone, startOfWeek } from './date'
-import type { LearnerProfile, Skill, StudySession, StudyTask } from '../types'
+import type { DailyCheckin, LearnerProfile, Skill, StudySession, StudyTask } from '../types'
 
 export function completionRate(tasks: StudyTask[], from?: string, to?: string) {
   const scoped = tasks.filter((task) => (!from || task.scheduledDate >= from) && (!to || task.scheduledDate <= to))
@@ -11,8 +11,8 @@ export function totalMinutes(sessions: StudySession[]) {
   return sessions.reduce((sum, session) => sum + session.durationMinutes, 0)
 }
 
-export function streak(tasks: StudyTask[], profile: LearnerProfile) {
-  const completedDays = new Set(tasks.filter((task) => task.status === 'completed').map((task) => task.scheduledDate))
+export function streak(checkins: DailyCheckin[], profile: LearnerProfile) {
+  const completedDays = new Set(checkins.filter((checkin) => checkin.habitQualified).map((checkin) => checkin.date))
   let cursor = dateKeyInTimeZone(new Date(), profile.timezone)
   if (!completedDays.has(cursor)) cursor = addDays(cursor, -1)
   let count = 0
@@ -23,10 +23,10 @@ export function streak(tasks: StudyTask[], profile: LearnerProfile) {
   return count
 }
 
-export function weeklyStudyDays(tasks: StudyTask[], today: string) {
+export function weeklyStudyDays(checkins: DailyCheckin[], today: string) {
   const start = startOfWeek(today)
   const end = addDays(start, 6)
-  return new Set(tasks.filter((task) => task.status === 'completed' && task.scheduledDate >= start && task.scheduledDate <= end).map((task) => task.scheduledDate)).size
+  return new Set(checkins.filter((checkin) => checkin.habitQualified && checkin.date >= start && checkin.date <= end).map((checkin) => checkin.date)).size
 }
 
 export function skillMinutes(sessions: StudySession[]) {

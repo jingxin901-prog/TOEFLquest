@@ -33,16 +33,18 @@ const skillOrder: Skill[] = ['reading', 'listening', 'speaking', 'writing', 'voc
 
 export function generateTasksForDay(profile: LearnerProfile, date: string, totalMinutes = profile.dailyMinutes, seed = 0): StudyTask[] {
   const minutes = Math.max(10, Math.min(180, Math.round(totalMinutes)))
-  const blockSize = minutes <= 15 ? minutes : minutes <= 60 ? 20 : 25
-  const blocks: number[] = []
-  let remaining = minutes
+  const blockSize = minutes <= 60 ? 20 : 25
+  const blocks: number[] = [Math.min(10, minutes)]
+  let remaining = minutes - blocks[0]
   while (remaining > 0) {
     const slots = Math.ceil(remaining / blockSize)
     const next = Math.ceil(remaining / slots)
     blocks.push(next)
     remaining -= next
   }
-  const ordered = [profile.weakSkill, ...skillOrder.filter((skill) => skill !== profile.weakSkill)]
+  const ordered = profile.prioritySkill
+    ? [profile.prioritySkill, ...skillOrder.filter((skill) => skill !== profile.prioritySkill)]
+    : skillOrder
 
   return blocks.map((durationMinutes, index) => {
     const skill = ordered[(index + seed) % ordered.length]
@@ -56,6 +58,7 @@ export function generateTasksForDay(profile: LearnerProfile, date: string, total
       durationMinutes,
       status: 'todo',
       source: 'rule',
+      isMinimumTask: index === 0,
       createdAt: new Date().toISOString(),
     }
   })
@@ -68,8 +71,8 @@ export function generateWeek(profile: LearnerProfile, startDate: string, complet
 }
 
 export const updatedToeflModules = [
-  { skill: '阅读', detail: 'Complete the Words · Read in Daily Life · Read an Academic Passage', count: '约 50 项 / 30 分钟' },
-  { skill: '听力', detail: 'Choose a Response · Conversation · Announcement · Academic Talk', count: '约 47 项 / 29 分钟' },
-  { skill: '写作', detail: 'Build a Sentence · Write an Email · Academic Discussion', count: '约 12 项 / 23 分钟' },
-  { skill: '口语', detail: 'Listen and Repeat · Take an Interview', count: '约 11 项 / 8 分钟' },
+  { skill: '阅读', detail: 'Complete the Words · Read in Daily Life · Read an Academic Passage', count: '按 ETS 2026 Blueprint 训练' },
+  { skill: '听力', detail: 'Choose a Response · Conversation · Announcement · Academic Talk', count: '按 ETS 2026 Blueprint 训练' },
+  { skill: '写作', detail: 'Build a Sentence · Write an Email · Academic Discussion', count: '按 ETS 2026 Blueprint 训练' },
+  { skill: '口语', detail: 'Listen and Repeat · Take an Interview', count: '按 ETS 2026 Blueprint 训练' },
 ]
