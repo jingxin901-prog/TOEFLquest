@@ -2,9 +2,9 @@
 
 面向 2026-01-21 之后新版 TOEFL iBT 的个人学习、监督与进步反馈系统。Sprint 1 已形成可实际使用的闭环：资料设置 → 周计划 → 月历任务 → 计时学习 → 明确完成 → 验证打卡 → 周统计 → 本机或 Supabase 持久化。
 
-> **在线使用：** [打开 TOEFL Quest 2.0](https://toefl-quest-daily-2026.josephine-dooley.chatgpt.site/)
+> **在线使用：** [打开 TOEFL Quest 2.0](https://jingxin901-prog.github.io/TOEFLquest/)
 >
-> 当前地址由 ChatGPT Sites 托管并已设为公开访问。GitHub Pages 地址将在仓库的 Pages 功能启用后生成。
+> 当前正式公开地址由 GitHub Pages 托管；ChatGPT Sites 版本保留为备用。
 
 ## Sprint 1 已完成
 
