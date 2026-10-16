@@ -1,11 +1,16 @@
+@import "@fontsource-variable/manrope";
+@import "@fontsource-variable/noto-sans-sc";
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  font-family: Inter, "PingFang SC", "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
+  --font-ui: "Manrope Variable", "Noto Sans SC Variable", "PingFang SC", "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-ui);
   color: #1f2d26;
   background: #f3f5f1;
   font-synthesis: none;
+  font-optical-sizing: auto;
+  font-variant-numeric: lining-nums;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -16,12 +21,22 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  font-weight: 450;
+  letter-spacing: -0.008em;
   background:
     radial-gradient(circle at 76% -10%, rgba(183, 222, 185, .22), transparent 30rem),
     #f3f5f1;
 }
 button, input, select, textarea { font: inherit; }
-button { cursor: pointer; }
+button { cursor: pointer; letter-spacing: -0.014em; }
+h1, h2, h3 {
+  font-family: var(--font-ui);
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+h4, h5, h6 { letter-spacing: -0.02em; }
+input, select, textarea { letter-spacing: -0.004em; }
+small, .text-xs { letter-spacing: 0; }
 ::selection { background: #bce8c9; color: #173b2b; }
 
 .soft-card {
@@ -42,6 +57,7 @@ button { cursor: pointer; }
 .metric-card {
   position: relative;
   overflow: hidden;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 .metric-card::after {
