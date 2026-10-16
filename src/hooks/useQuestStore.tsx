@@ -344,7 +344,12 @@ export function QuestStoreProvider({ children }: { children: ReactNode }) {
     const { error } = await supabase.auth.signUp({ email, password })
     return error?.message ?? null
   }
-  const signOut = async () => { if (supabase) await supabase.auth.signOut() }
+  const signOut = async () => {
+    if (supabase) await supabase.auth.signOut()
+    localStorage.removeItem(REAL_KEY)
+    setData(emptyData('real'))
+    setSyncStatus('local')
+  }
 
   const value = useMemo<QuestStoreValue>(() => ({
     ...data, user, cloudEnabled: isSupabaseConfigured, syncStatus,
