@@ -4,16 +4,16 @@ import { SKILL_META, type Skill } from '../types'
 
 export function Button({ children, className = '', variant = 'primary', ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost' | 'danger' }) {
   const variants = {
-    primary: 'bg-[#287553] text-white shadow-sm hover:bg-[#1f6546]',
-    secondary: 'border border-[#d9e4dc] bg-white text-[#2f4b3d] hover:bg-[#f3f7f4]',
-    ghost: 'text-[#52665c] hover:bg-[#edf3ef]',
+    primary: 'bg-[#216747] text-white shadow-[0_6px_18px_rgba(33,103,71,.16)] hover:bg-[#18583b] hover:-translate-y-px',
+    secondary: 'border border-[#d8e0da] bg-[#fffefd] text-[#29483a] shadow-sm hover:border-[#bccdc1] hover:bg-white',
+    ghost: 'text-[#52665c] hover:bg-[#e9efea]',
     danger: 'bg-[#fff1ef] text-[#a34338] hover:bg-[#ffe5e1]',
   }
-  return <button className={`focus-ring inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${variants[variant]} ${className}`} {...props}>{children}</button>
+  return <button className={`focus-ring inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition duration-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 ${variants[variant]} ${className}`} {...props}>{children}</button>
 }
 
 export function Card({ children, className = '', ...props }: HTMLAttributes<HTMLElement> & { children: ReactNode }) {
-  return <section className={`soft-card rounded-[22px] ${className}`} {...props}>{children}</section>
+  return <section className={`soft-card rounded-[18px] transition-colors duration-200 ${className}`} {...props}>{children}</section>
 }
 
 export function SkillBadge({ skill }: { skill: Skill }) {
@@ -24,7 +24,7 @@ export function SkillBadge({ skill }: { skill: Skill }) {
 export function Modal({ open, onClose, title, children, width = 'max-w-lg', closable = true }: { open: boolean; onClose: () => void; title: string; children: ReactNode; width?: string; closable?: boolean }) {
   if (!open) return null
   return <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#163025]/35 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={title}>
-    <div className={`quest-pop max-h-[92vh] w-full overflow-y-auto rounded-[24px] bg-white shadow-2xl ${width}`}>
+    <div className={`quest-pop max-h-[92vh] w-full overflow-y-auto rounded-[20px] bg-white shadow-2xl ${width}`}>
       <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#e8eee9] bg-white/95 px-6 py-5 backdrop-blur">
         <h2 className="text-lg font-bold text-[#1d3529]">{title}</h2>
         {closable && <button onClick={onClose} className="focus-ring rounded-lg p-2 text-[#64766c] hover:bg-[#f0f4f1]" aria-label="关闭"><X size={18} /></button>}
