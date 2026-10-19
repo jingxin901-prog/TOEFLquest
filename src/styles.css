@@ -3,6 +3,13 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.25rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.5rem;
+}
+
 :root {
   --font-ui: "Manrope Variable", "Noto Sans SC Variable", "PingFang SC", "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
   font-family: var(--font-ui);
@@ -37,6 +44,11 @@ h1, h2, h3 {
 h4, h5, h6 { letter-spacing: -0.02em; }
 input, select, textarea { letter-spacing: -0.004em; }
 small, .text-xs { letter-spacing: 0; }
+
+/* Keep compact interface labels readable on phones without flattening hierarchy. */
+.text-\[9px\] { font-size: 0.6875rem; line-height: 1rem; }
+.text-\[10px\] { font-size: 0.75rem; line-height: 1.125rem; }
+.text-\[11px\] { font-size: 0.8125rem; line-height: 1.25rem; }
 ::selection { background: #bce8c9; color: #173b2b; }
 
 .soft-card {
