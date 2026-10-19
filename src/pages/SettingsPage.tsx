@@ -1,8 +1,15 @@
-import { Bell, Cloud, Download, ExternalLink, FlaskConical, Laptop, ShieldCheck } from 'lucide-react'
+import { Bell, Cloud, Download, ExternalLink, FlaskConical, Laptop, ShieldCheck, Type } from 'lucide-react'
 import { useState } from 'react'
 import { Button, Card } from '../components/ui'
 import { useQuestStore } from '../hooks/useQuestStore'
+import { applyFontScale, readFontScale, type FontScale } from '../lib/display'
 import { SKILL_META, type Skill } from '../types'
+
+const fontScaleOptions: { value: FontScale; label: string; sample: string }[] = [
+  { value: 'small', label: '小号', sample: '紧凑' },
+  { value: 'standard', label: '标准', sample: '舒适' },
+  { value: 'large', label: '大号', sample: '清晰' },
+]
 
 export function SettingsPage() {
   const store = useQuestStore()
@@ -11,7 +18,13 @@ export function SettingsPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [authMessage, setAuthMessage] = useState('')
+  const [fontScale, setFontScale] = useState(readFontScale)
   const [notificationState, setNotificationState] = useState(() => 'Notification' in window ? Notification.permission : 'unsupported')
+
+  const changeFontScale = (value: FontScale) => {
+    setFontScale(value)
+    applyFontScale(value)
+  }
 
   const save = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -36,7 +49,7 @@ export function SettingsPage() {
     URL.revokeObjectURL(url)
   }
 
-  return <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
+  return <div className="settings-page grid gap-6 xl:grid-cols-[1fr_380px]">
     <div className="space-y-6">
       <Card className="p-6"><h2 className="text-lg font-extrabold">学习档案</h2><p className="mt-1 text-xs text-[#7b8981]">六级仅保留为自评说明，不自动换算 TOEFL；目标成绩允许为空。</p><form onSubmit={save} className="mt-6 space-y-5"><div className="grid gap-4 sm:grid-cols-2"><label className="text-sm font-semibold text-[#42584c]">称呼<input value={profile.name} onChange={(event) => setProfile({ ...profile, name: event.target.value })} className="focus-ring mt-2 w-full rounded-xl border border-[#dce5df] px-3 py-3 font-normal" /></label><label className="text-sm font-semibold text-[#42584c]">当前水平（自评）<input value={profile.selfReportedLevel} onChange={(event) => setProfile({ ...profile, selfReportedLevel: event.target.value })} className="focus-ring mt-2 w-full rounded-xl border border-[#dce5df] px-3 py-3 font-normal" /></label><label className="text-sm font-semibold text-[#42584c]">考试日期（可空）<input type="date" value={profile.examDate ?? ''} onChange={(event) => setProfile({ ...profile, examDate: event.target.value || null })} className="focus-ring mt-2 w-full rounded-xl border border-[#dce5df] px-3 py-3 font-normal" /></label><label className="text-sm font-semibold text-[#42584c]">目标分数（1–6，可空）<input type="number" min="1" max="6" step="0.5" value={profile.targetScore ?? ''} onChange={(event) => setProfile({ ...profile, targetScore: event.target.value ? Number(event.target.value) : null })} placeholder="确定申请要求后填写" className="focus-ring mt-2 w-full rounded-xl border border-[#dce5df] px-3 py-3 font-normal" /></label><label className="text-sm font-semibold text-[#42584c]">每日分钟<input type="number" min="10" max="180" value={profile.dailyMinutes} onChange={(event) => setProfile({ ...profile, dailyMinutes: Number(event.target.value) })} className="focus-ring mt-2 w-full rounded-xl border border-[#dce5df] px-3 py-3 font-normal" /></label><label className="text-sm font-semibold text-[#42584c]">训练优先项<select value={profile.prioritySkill ?? ''} onChange={(event) => setProfile({ ...profile, prioritySkill: event.target.value ? event.target.value as Skill : null })} className="focus-ring mt-2 w-full rounded-xl border border-[#dce5df] bg-white px-3 py-3 font-normal"><option value="">诊断前不预设</option>{(Object.keys(SKILL_META) as Skill[]).filter((skill) => skill !== 'vocabulary').map((skill) => <option value={skill} key={skill}>{SKILL_META[skill].label}</option>)}</select></label><label className="text-sm font-semibold text-[#42584c] sm:col-span-2">时区<input value={profile.timezone} onChange={(event) => setProfile({ ...profile, timezone: event.target.value })} placeholder="Asia/Shanghai" className="focus-ring mt-2 w-full rounded-xl border border-[#dce5df] px-3 py-3 font-normal" /></label></div><div className="flex items-center justify-end gap-3"><span className={`text-xs font-semibold text-[#3c7d5b] transition ${saved ? 'opacity-100' : 'opacity-0'}`}>设置已保存</span><Button type="submit">保存学习档案</Button></div></form></Card>
 
@@ -44,6 +57,14 @@ export function SettingsPage() {
     </div>
 
     <div className="space-y-6">
+      <Card className="p-6">
+        <div className="flex items-start gap-3"><div className="rounded-xl bg-[#edf5ee] p-2.5 text-[#397958]"><Type size={19} /></div><div><h2 className="font-extrabold">阅读显示</h2><p className="mt-1 text-xs text-[#7b8981]">选择适合当前设备的界面字号，设置会保存在这个浏览器中。</p></div></div>
+        <div className="mt-5 grid grid-cols-3 gap-2" role="group" aria-label="界面字号">
+          {fontScaleOptions.map((option) => <button key={option.value} type="button" aria-pressed={fontScale === option.value} onClick={() => changeFontScale(option.value)} className={`focus-ring rounded-xl border px-2 py-3 text-center transition ${fontScale === option.value ? 'border-[#4a956e] bg-[#eaf6ed] text-[#215f40]' : 'border-[#dfe7e1] bg-white text-[#5f7067] hover:border-[#abcbb5]'}`}><span className={`${option.value === 'small' ? 'text-xs' : option.value === 'large' ? 'text-lg' : 'text-sm'} block font-extrabold`}>{option.label}</span><span className="mt-1 block text-[10px] font-medium opacity-75">{option.sample}</span></button>)}
+        </div>
+        <p className="mt-4 rounded-xl bg-[#f3f6f3] px-4 py-3 text-xs text-[#6e7d75]">当前为“{fontScaleOptions.find((option) => option.value === fontScale)?.label}”。字号只影响界面显示，不会改变学习记录。</p>
+      </Card>
+
       <Card className="p-6"><div className="flex items-center gap-3"><div className="rounded-xl bg-[#edf4fb] p-2.5 text-[#4f7da5]"><Cloud size={19} /></div><div><h2 className="font-extrabold">云端同步</h2><p className="mt-1 text-xs text-[#7d8a83]">{store.cloudEnabled ? store.user ? `已登录 ${store.user.email}` : 'Supabase 已配置，尚未登录' : '未配置 Supabase，当前为本机模式'}</p></div></div>{store.user ? <Button variant="secondary" className="mt-5 w-full" onClick={store.signOut}>退出云端账号</Button> : <div className="mt-5 space-y-3"><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="邮箱" className="focus-ring w-full rounded-xl border border-[#dce5df] px-3 py-3 text-sm" /><input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="密码（至少 6 位）" className="focus-ring w-full rounded-xl border border-[#dce5df] px-3 py-3 text-sm" /><div className="grid grid-cols-2 gap-2"><Button disabled={!store.cloudEnabled || !email || !password} onClick={async () => setAuthMessage((await store.signIn(email, password)) ?? '登录成功')}>登录</Button><Button variant="secondary" disabled={!store.cloudEnabled || !email || !password} onClick={async () => setAuthMessage((await store.signUp(email, password)) ?? '注册成功；请检查邮箱验证设置')}>注册</Button></div>{authMessage && <p className="rounded-xl bg-[#f2f5f3] p-3 text-xs leading-5 text-[#65766c]">{authMessage}</p>}</div>}<div className="mt-5 flex gap-2 rounded-xl bg-[#f2f6f3] p-3 text-[11px] leading-5 text-[#6e7d75]"><ShieldCheck size={16} className="mt-0.5 shrink-0 text-[#397b59]" />数据库启用 RLS 后，每个账号只能读取和修改自己的学习数据。</div></Card>
 
       <Card className="p-6"><div className="flex items-center gap-3"><div className="rounded-xl bg-[#f2eff8] p-2.5 text-[#7565a5]"><Laptop size={19} /></div><div><h2 className="font-extrabold">AI 学习教练</h2><p className="mt-1 text-xs text-[#7d8a83]">当前：本地规则模式</p></div></div><p className="mt-4 text-xs leading-6 text-[#708078]">AI 接口通过服务端代理预留，不在浏览器暴露密钥。未配置时，核心功能不受影响。</p><a href="https://www.ets.org/toefl/test-takers/ibt/about/content.html" target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-[#3b7557] hover:underline">查看 ETS 新版考试结构 <ExternalLink size={12} /></a></Card>

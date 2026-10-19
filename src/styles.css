@@ -24,6 +24,9 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+html[data-font-scale="small"] { font-size: 15px; }
+html[data-font-scale="standard"] { font-size: 16px; }
+html[data-font-scale="large"] { font-size: 17px; }
 body {
   margin: 0;
   min-width: 320px;
@@ -50,6 +53,28 @@ small, .text-xs { letter-spacing: 0; }
 .text-\[10px\] { font-size: 0.75rem; line-height: 1.125rem; }
 .text-\[11px\] { font-size: 0.8125rem; line-height: 1.25rem; }
 ::selection { background: #bce8c9; color: #173b2b; }
+
+/* Raise contrast for frequently used secondary copy in the light theme. */
+:root:not(.dark) [class*="text-[#7b8981]"],
+:root:not(.dark) [class*="text-[#7d8a83]"],
+:root:not(.dark) [class*="text-[#7a8880]"],
+:root:not(.dark) [class*="text-[#7e8c84]"],
+:root:not(.dark) [class*="text-[#738178]"] { color: #617168 !important; }
+
+:root:not(.dark) [class*="text-[#819087]"],
+:root:not(.dark) [class*="text-[#829088]"],
+:root:not(.dark) [class*="text-[#849088]"],
+:root:not(.dark) [class*="text-[#87938c]"],
+:root:not(.dark) [class*="text-[#8a968f]"],
+:root:not(.dark) [class*="text-[#8a9790]"],
+:root:not(.dark) [class*="text-[#8b9690]"] { color: #66766d !important; }
+
+.settings-page,
+.plan-page { gap: 1.75rem; }
+.settings-page > div > * + *,
+.plan-page > * + * { margin-top: 1.75rem; }
+.settings-page p,
+.plan-page p { line-height: 1.65; }
 
 .soft-card {
   border: 1px solid rgba(43, 66, 54, .1);

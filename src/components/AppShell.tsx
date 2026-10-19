@@ -2,6 +2,7 @@ import { BarChart3, CalendarDays, Cloud, CloudOff, Compass, LayoutDashboard, Moo
 import { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { useQuestStore } from '../hooks/useQuestStore'
+import { applyFontScale, readFontScale } from '../lib/display'
 import { TimerDock } from './TimerDock'
 
 const navItems = [
@@ -18,6 +19,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation()
   const { syncStatus, user, dataMode } = useQuestStore()
   const [dark, setDark] = useState(() => localStorage.getItem('toefl-quest:theme') === 'dark')
+  const [fontScale] = useState(readFontScale)
+  useEffect(() => applyFontScale(fontScale), [fontScale])
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark)
     localStorage.setItem('toefl-quest:theme', dark ? 'dark' : 'light')

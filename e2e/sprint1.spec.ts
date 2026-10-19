@@ -32,3 +32,17 @@ test('Sprint 1: create, time, complete, check in, and restore after refresh', as
   await expect(page.getByText('今天已完成习惯打卡')).toBeVisible()
   await expect(task.getByRole('button', { name: '标为未完成' })).toBeVisible()
 })
+
+test('display size can be changed and restored after refresh', async ({ page }) => {
+  await page.getByRole('button', { name: /生成我的 7 天计划/ }).click()
+  await page.goto('/#/settings')
+
+  const largeSize = page.getByRole('button', { name: /大号/ })
+  await largeSize.click()
+  await expect(largeSize).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('html')).toHaveAttribute('data-font-scale', 'large')
+
+  await page.reload()
+  await expect(page.getByRole('button', { name: /大号/ })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('html')).toHaveAttribute('data-font-scale', 'large')
+})
